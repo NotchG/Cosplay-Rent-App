@@ -1,17 +1,15 @@
-import 'dart:convert';
-
-import 'package:cosplayrentapp/MockData/Catalogue.dart';
-import 'package:faker/faker.dart';
+import 'package:cosplayrentapp/model/services/mock_api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_profile_picture/flutter_profile_picture.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
-import 'components/CatalogueCard.dart';
+import '../components/catalogue_card.dart';
+import '../components/loading_widget.dart';
 
 class HomePage extends StatefulWidget {
-  final MockDatabase data;
-  const HomePage({super.key, required this.data});
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -19,14 +17,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
-  List<CatalogueData> catalogues = [];
-
   @override
   void initState() {
     super.initState();
-    setState(() {
-      catalogues = widget.data.mockCatalogues;
-    });
   }
 
   @override
@@ -166,22 +159,33 @@ class _HomePageState extends State<HomePage> {
                 SizedBox(
                   height: 20,
                 ),
-                SizedBox(
-                  height: 265,
-                  child: ListView(
-                    shrinkWrap: true,
-                    scrollDirection: Axis.horizontal,
-                    children: catalogues.map((e) {
-                      return Row(
-                        children: [
-                          CatalogueCard(
-                            data: e,
-                          ),
-                          SizedBox(width: 20,)
-                        ],
+                FutureBuilder(
+                  future: MockApiService().getCatalogueList(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return Text("Error: ${snapshot.error}");
+                    }
+                    if (snapshot.hasData) {
+                      return SizedBox(
+                        height: 265,
+                        child: ListView(
+                          shrinkWrap: true,
+                          scrollDirection: Axis.horizontal,
+                          children: snapshot.data!.map((e) {
+                            return Row(
+                              children: [
+                                CatalogueCard(
+                                  data: e,
+                                ),
+                                SizedBox(width: 20,)
+                              ],
+                            );
+                          }).toList().cast(),
+                        ),
                       );
-                    }).toList().cast(),
-                  ),
+                    }
+                    return const LoadingWidget();
+                  },
                 )
               ],
             ),

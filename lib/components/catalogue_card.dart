@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:qlevar_router/qlevar_router.dart';
 
-import '../../../MockData/Catalogue.dart';
+import '../model/data/catalogue_class.dart';
 
 class CatalogueCard extends StatefulWidget {
-  final CatalogueData data;
+  final Catalogue data;
   const CatalogueCard({super.key, required this.data});
 
   @override
